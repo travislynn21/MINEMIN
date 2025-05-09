@@ -1,0 +1,5 @@
+First Name,Last Name,Email Address,Department,Role,Custom Attributes
+John,Doe,john.doe@example.com,Engineering,Developer,"{\"GitHub\": \"johndoe\"}"
+Jane,Smith,jane.smith@example.com,HR,Manager,"{\"LinkedIn\": \"janesmith\"}"
+Alice,Johnson,alice.johnson@example.com,Sales,Salesperson,"{\"CRM\": \"alicejohnson\"}"
+Bob,Brown,bob.brown@example.com,Engineering,Tester,"{\"Jira\": \"bobbrown\"}"
