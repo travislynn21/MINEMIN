@@ -1,9 +1,10 @@
 import sqlite3
-import hashlib
+from argon2 import PasswordHasher
 
 class Auth:
     def __init__(self, db_path="onboarding_tool.db"):
         self.db_path = db_path
+        self.ph = PasswordHasher()
         self._initialize_auth_table()
 
     def _initialize_auth_table(self):
@@ -23,7 +24,7 @@ class Auth:
 
     def register_user(self, username, password, role):
         """Register a new user with a hashed password."""
-        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        password_hash = self.ph.hash(password)
         connection = sqlite3.connect(self.db_path)
         cursor = connection.cursor()
         try:
@@ -39,16 +40,20 @@ class Auth:
 
     def authenticate_user(self, username, password):
         """Authenticate a user by verifying the password."""
-        password_hash = hashlib.sha256(password.encode()).hexdigest()
         connection = sqlite3.connect(self.db_path)
         cursor = connection.cursor()
         cursor.execute('''
-            SELECT role FROM users WHERE username = ? AND password_hash = ?
-        ''', (username, password_hash))
+            SELECT password_hash, role FROM users WHERE username = ?
+        ''', (username,))
         result = cursor.fetchone()
         connection.close()
         if result:
-            return result[0]  # Return the role
+            password_hash, role = result
+            try:
+                self.ph.verify(password_hash, password)
+                return role  # Return the role
+            except Exception:
+                raise Exception("Invalid username or password.")
         else:
             raise Exception("Invalid username or password.")
 
